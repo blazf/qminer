@@ -542,6 +542,24 @@ exports.confusionMatrix = function (cats) {
             console.log(line);
         }
     }
+    
+    //#     - `cf.reportCSV(fout)` -- report on the current status
+    this.reportCSV = function(fout) {
+        // print header
+        var header = "";
+        for (var i = 0; i < this.cats.length; i++) {
+            header = header + "," + this.cats[i];
+        }
+        fout.writeLine(header);
+        // print elements
+        for (var i = 0; i < this.cats.length; i++) {
+            var line = this.cats[i];
+            for (var j = 0; j < this.cats.length; j++) {
+                line = line + "," + Math.round(this.matrix.at(i, j));
+            }
+            fout.writeLine(line);
+        }
+    }    
 }
 
 //#- `result = analytics.crossValidation(rs, features, target, folds)` -- creates a batch
