@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2015, Jozef Stefan Institute, Quintelligence d.o.o. and contributors
  * All rights reserved.
- * 
+ *
  * This source code is licensed under the FreeBSD license found in the
  * LICENSE file in the root directory of this source tree.
  */
@@ -452,7 +452,7 @@ double TBowSim::GetCosSim(const PBowSpV& SpV1, const PBowSpV& SpV2) {
   int WIds1=SpV1->GetWIds();
   int WIds2=SpV2->GetWIds();
   // search for equal words in both documents
-  double WordWgtProdSum=0; int IntsWords=0;
+  double WordWgtProdSum=0;
   int WIdN1=0; int WIdN2=0;
   while ((WIdN1<WIds1)&&(WIdN2<WIds2)){
     int WId1=SpV1->GetWId(WIdN1);
@@ -467,7 +467,7 @@ double TBowSim::GetCosSim(const PBowSpV& SpV1, const PBowSpV& SpV2) {
       double WordWgt1=SpV1->GetWgt(WIdN1); WIdN1++;
       double WordWgt2=SpV2->GetWgt(WIdN2); WIdN2++;
       double WordWgtProd=WordWgt1*WordWgt2;
-      WordWgtProdSum+=WordWgtProd; IntsWords++;
+      WordWgtProdSum+=WordWgtProd;
     } else {
       WIdN1++;
     }
@@ -490,7 +490,7 @@ double TBowSim::GetCosSim(
   int WIds1=SpV1->GetWIds();
   int WIds2=SpV2->GetWIds();
   // search for equal words in both documents
-  double WordWgtProdSum=0; int IntsWords=0;
+  double WordWgtProdSum=0;
   int WIdN1=0; int WIdN2=0; WgtWIdPrV.Clr();
   while ((WIdN1<WIds1)&&(WIdN2<WIds2)){
     int WId1=SpV1->GetWId(WIdN1);
@@ -505,7 +505,7 @@ double TBowSim::GetCosSim(
       double WordWgt1=SpV1->GetWgt(WIdN1); WIdN1++;
       double WordWgt2=SpV2->GetWgt(WIdN2); WIdN2++;
       double WordWgtProd=WordWgt1*WordWgt2;
-      WordWgtProdSum+=WordWgtProd; IntsWords++;
+      WordWgtProdSum+=WordWgtProd;
       WgtWIdPrV.Add(TFltIntPr(WordWgtProd, WId1));
     } else {
       WIdN1++;
@@ -781,7 +781,7 @@ PBowDocWgtBs TBowDocWgtBs::New(const TVec<PBowSpV>& BowSpVV) {
         AllWords = TInt::GetMx(AllWords, BowSpVV[DocN]->GetLastWId()+1);
     }
     // load documents
-    DocWgtBs->WordFqV.Gen(AllWords); 
+    DocWgtBs->WordFqV.Gen(AllWords);
     DocWgtBs->WordFqV.PutAll(0.0);
     DocWgtBs->DocSpVV = BowSpVV;
     // return result
@@ -1407,11 +1407,11 @@ void TBowDocBs::DelDoc(const TStr& DocNm) {
 	int DId=-1;
 	if (!DocNmToDescStrH.IsKey(DocNm, DId))
 		return;
-	
+
 	// remove the categories for the document
 	DocCIdVV[DId].Clr();
 	PBowSpV DocSpV=DocSpVV[DId];
-  
+
 	// decrease the document frequency for the words
 	for (int WIdN = 0; WIdN < DocSpV->GetWIds(); WIdN++) {
 		int WId = DocSpV->GetWId(WIdN);
@@ -1445,7 +1445,7 @@ int TBowDocBs::AppendDoc(const TStr& _DocNm, const TStrV& CatNmV, const TStrV& W
 	TStrIntH DocWordStrToFqH;
 	for (int WordStrN=0; WordStrN<WordStrV.Len(); WordStrN++)
 		DocWordStrToFqH.AddDat(WordStrV[WordStrN])++;
-	
+
 	// compose document bag-of-words vector
 	PBowSpV DocSpV=DocSpVV[DId];
 	for (int DocWordStrN=0; DocWordStrN<DocWordStrToFqH.Len(); DocWordStrN++) {
@@ -1517,7 +1517,7 @@ void TBowDocBs::AppendWord(const int DId, const TStr& Word, const float Wgt) {
 		DocSpV->AddWIdWgt(WId, Wgt);			// for new WIds add them to the vector
 }
 
-/// create a new BowDocBs where a document i is created by merging the vector of documents DIdVV[i]. 
+/// create a new BowDocBs where a document i is created by merging the vector of documents DIdVV[i].
 // The name of the document i is DocNmV[i]
 // NOTE: Categories are ignored
 PBowDocBs TBowDocBs::GetMergedDocs(const TVec<TIntV>& DIdVV, const TStrV& DocNmV) const {
@@ -1525,7 +1525,7 @@ PBowDocBs TBowDocBs::GetMergedDocs(const TVec<TIntV>& DIdVV, const TStrV& DocNmV
 	PBowDocBs BowDocBs=TBowDocBs::New();
 	BowDocBs->DocSpVV.Gen(DIdVV.Len(), 0);
 	BowDocBs->DocCIdVV.Gen(DIdVV.Len(), 0);
-	
+
 	// copy the hash with mapping of words to ids
 	for (int N=0; N < GetWords(); N++)
 		BowDocBs->AddWordStr(GetWordStr(N));
@@ -1938,7 +1938,7 @@ PBowSpV TBowDocBs::GetSpVFromHtmlStr(
   return DocSpV;
 }
 
-PBowSpV TBowDocBs::GetSpVFromHtmlStr(const TStr& HtmlStr, 
+PBowSpV TBowDocBs::GetSpVFromHtmlStr(const TStr& HtmlStr,
         const int& Docs, const TFltV& WordFqV) const {
 
     // get word-list

@@ -1,12 +1,12 @@
 ﻿/**
  * Copyright (c) 2015, Jozef Stefan Institute, Quintelligence d.o.o. and contributors
  * All rights reserved.
- * 
+ *
  * This source code is licensed under the FreeBSD license found in the
  * LICENSE file in the root directory of this source tree.
  */
 #include "unicodebow.h"
-#include <iostream> 
+#include <iostream>
 
 namespace TUnicodeVSM {
 	int64 loadToCBuffer(FILE** id, char *buffer, int64 dol = 134217728, char newline = '\n'){
@@ -156,12 +156,12 @@ namespace TUnicodeVSM {
 		WordNgrams.Save(SOut);
 		Ngrams.Save(SOut);
 		Matrix.Save(SOut);
-		//Added 
+		//Added
 		InvDoc.Save(SOut);
 		NDocs.Save(SOut);
 		TFidf.Save(SOut);
 	}
-	
+
 	void TGlibUBow::LoadBin(TSIn& SIn){
 		Option.Load(SIn);
 		Lang.Load(SIn);
@@ -201,7 +201,7 @@ namespace TUnicodeVSM {
 			TFidf.Load(SIn);
 		}
 	}
-	
+
 	void TGlibUBow::DelMatrix(){
 		this->Matrix.Clr();
 	}
@@ -259,7 +259,7 @@ namespace TUnicodeVSM {
 		this->BrOnSt = BrOnSt;
 	}
 	//WordNgrams need further testing
-	TVec<TIntKd> TGlibUBow::TextToVec(TUStr& Text){	
+	TVec<TIntKd> TGlibUBow::TextToVec(TUStr& Text){
 		switch (Option) {
 		case tWord:
 			return this->_TokenizeWords(Text);
@@ -281,7 +281,7 @@ namespace TUnicodeVSM {
 	void TGlibUBow::TextToVec(TUStr& Text, TPair<TIntV, TFltV>& SparseVec) {
 		TVec<TIntKd> SpVec = TextToVec(Text);
 		//Convert
-		TIntV IdxV; 
+		TIntV IdxV;
 		TFltV ValV;
 		IdxV.Gen(SpVec.Len());
 		ValV.Gen(SpVec.Len());
@@ -474,7 +474,7 @@ namespace TUnicodeVSM {
 		return TGlibUBow::AddTokenizeSimpleNgrams(Text, true, false, false);
 		//return this->Vector;
 	}
-		
+
 	void TGlibUBow::Tokenize(TUStr& Doc){
 		switch (this->Option.Val){
 		case tWordNgram:
@@ -797,7 +797,6 @@ namespace TUnicodeVSM {
 			TChineseTokenizer::TokenizeClean(Text.GetStr(), Words, Seperators);
 		}
 
-		int i = 0;
 		TLst<TUStr>::PLstNd WordNode = Words.First();
 		TLst<TBool>::PLstNd BoolNode = Seperators.First();
 		while (WordNode){//i < Words.Len()
@@ -844,7 +843,6 @@ namespace TUnicodeVSM {
 			}
 			BoolNode = BoolNode->NextNd;
 			WordNode = WordNode->NextNd;
-			i++;
 		}
 	}
 	void TGlibUBow::CompactVocabulary(TIntV& WordIndex, TInt Shift){

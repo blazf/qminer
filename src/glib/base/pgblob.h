@@ -137,6 +137,8 @@ public:
     int GetPrimHashCd() const;
     /// for insertion into THash
     int GetSecHashCd() const;
+
+    TStr GetStr() const { return TStr::Fmt("%d:%d:%d", FileIndex, Page, ItemIndex); }
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -275,7 +277,7 @@ private:
 
 protected:
     /// Housekeeping record for each loaded page
-    struct LoadedPage {
+    struct TLoadedPage {
     public:
         /// Blob pointer of this page
         TPgBlobPgPt Pt;
@@ -345,7 +347,7 @@ protected:
     /// Pointers for loaded pages
     THash<TPgBlobPgPt, int> LoadedPagesH;
     /// Pointers for loaded pages
-    TVec<LoadedPage> LoadedPages;
+    TVec<TLoadedPage> LoadedPages;
     /// Heap structure that keeps track of free space in pages
     TPgBlobFsm Fsm;
 

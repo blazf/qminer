@@ -42,7 +42,7 @@
                     'MACOSX_DEPLOYMENT_TARGET': '10.7',
                     'GCC_ENABLE_CPP_RTTI': 'YES',
                     'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-                    'OTHER_CFLAGS': [ '-std=c++11', '-stdlib=libc++' ]
+                    'OTHER_CFLAGS': [ '-std=c++11', '-stdlib=libc++', '-Wno-deprecated-declarations', '-Wno-deprecated-copy-with-user-provided-copy', '-Wno-null-dereference', '-Wno-unused-but-set-variable' ]
                 },
             }],
         ],
@@ -113,10 +113,27 @@
     'targets': [
         {
             # unit tests module
+            'target_name': 'glib-base-test',
+            'type': 'executable',
+            'sources': [
+                'test/cpp/test_main.cpp',
+                'test/cpp/test_blobbs.cpp',
+                'test/cpp/test_pgblob.cpp'
+            ],
+            'include_dirs': [
+                'src/glib/base'
+            ],
+            'dependencies': [
+                'glib'
+            ]
+        },
+        {
+            # unit tests module
             'target_name': 'qminer-test',
             'type': 'executable',
             'sources': [
                 'test/cpp/test_main.cpp',
+                'test/cpp/test_storage.cpp',
                 'test/cpp/test_linalg.cpp',
                 'test/cpp/test_misc.cpp',
                 'test/cpp/test_quantiles.cpp',

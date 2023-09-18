@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2015, Jozef Stefan Institute, Quintelligence d.o.o. and contributors
  * All rights reserved.
- * 
+ *
  * This source code is licensed under the FreeBSD license found in the
  * LICENSE file in the root directory of this source tree.
  */
@@ -610,17 +610,17 @@ void TBowDocPart::SaveXml(
 }
 
 //B:
-void TBowDocPart::SaveRdfClusts(const PSOut& SOut, const PBowDocBs& BowDocBs, 
+void TBowDocPart::SaveRdfClusts(const PSOut& SOut, const PBowDocBs& BowDocBs,
         TIntIntVH& DIdClustIdVH, const int& FatherId, int& ClustId) const {
 
     for (int ClustN=0; ClustN<GetClusts(); ClustN++) {
         PBowDocPartClust Clust=GetClust(ClustN);
         TStr CptNm, KeyWdStr;
-        
+
         if (!Clust->GetNm().Empty()){
             CptNm = Clust->GetNm(); }
         if (Clust->IsConceptSpV()) {
-            KeyWdStr = Clust->GetConceptSpV()->GetStr(BowDocBs, 20); 
+            KeyWdStr = Clust->GetConceptSpV()->GetStr(BowDocBs, 20);
             if (CptNm.Empty()) {
                 CptNm = Clust->GetConceptSpV()->GetStr(BowDocBs, 5, 1, ", ", false); }
         }
@@ -666,7 +666,7 @@ void TBowDocPart::SaveRdfClusts(const PSOut& SOut, const PBowDocBs& BowDocBs,
 //B:
 void TBowDocPart::SaveRdf(const TStr& FNm, const PBowDocBs& BowDocBs) const {
     PSOut SOut=TFOut::New(FNm);
-    
+
     SOut->PutStrLn("<?xml version='1.0' encoding='UTF-8'?>");
     SOut->PutStrLn("");
     SOut->PutStrLn("<!DOCTYPE rdf:RDF [");
@@ -703,9 +703,9 @@ void TBowDocPart::SaveRdf(const TStr& FNm, const PBowDocBs& BowDocBs) const {
     SOut->PutStrLn("  <owl:versionInfo>\"0.1\"</owl:versionInfo>");
     SOut->PutStrLn("</owl:Ontology>");
     SOut->PutStrLn("");
-    
+
     TIntIntVH DIdClustIdVH; int ClustId = 0;
-    SaveRdfClusts(SOut, BowDocBs, DIdClustIdVH, -1, ClustId);  
+    SaveRdfClusts(SOut, BowDocBs, DIdClustIdVH, -1, ClustId);
 
     TIntV AllDIdV; BowDocBs->GetAllDIdV(AllDIdV);
     TStr BowFNm = TStr::PutFExt(FNm, "_docs.bow");
@@ -728,7 +728,7 @@ void TBowDocPart::SaveRdf(const TStr& FNm, const PBowDocBs& BowDocBs) const {
         SOut->PutStrLn(TStr::Fmt("  <jsikm:locationOfInstance>%s#%d</jsikm:locationOfInstance>", ShortBowFNm.CStr(), DId));
         SOut->PutStrLn("</jsikm:OntoGenClassProperties>");
         SOut->PutStrLn("");
-    }        
+    }
 
     SOut->PutStrLn("</rdf:RDF>");
     SOut->Flush();
@@ -767,10 +767,10 @@ PBowSpV TBowClust::GetConceptSpV(
   } else {
     // prepare data
     int Words=BowDocWgtBs->GetWords();
-    TFltV WordWgtSumV(Words); double WordWgtSum=0;
+    TFltV WordWgtSumV(Words);
     int DIds=DIdV.Len();
     // prepare document weights
-    TIntFltH DocIdToWgtH(DIds); 
+    TIntFltH DocIdToWgtH(DIds);
     for (int DIdN=0; DIdN<DocIdWgtPrV.Len(); DIdN++){
       DocIdToWgtH.AddDat(DocIdWgtPrV[DIdN].Val1, DocIdWgtPrV[DIdN].Val2);
     }
@@ -785,7 +785,7 @@ PBowSpV TBowClust::GetConceptSpV(
       int WIds=SpV->GetWIds();
       for (int WIdN=0; WIdN<WIds; WIdN++){
         int WId; double WordWgt; SpV->GetWIdWgt(WIdN, WId, WordWgt);
-        WordWgtSumV[WId]+=DocWgt.Val*WordWgt; WordWgtSum+=DocWgt.Val*WordWgt;
+        WordWgtSumV[WId]+=DocWgt.Val*WordWgt;
       }
     }
     // extract non-zero word weights

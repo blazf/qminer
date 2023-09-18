@@ -947,11 +947,13 @@ public:
 	}
 
 	void Clr() {
-		int nUsed = 0, nFree = 0;
+		int nFree = 0;
 		for (TNodeId node = 0; node < nodes.Len(); node++) {
 			if (nodes[node].Empty()) { nFree++; continue; }
-			nUsed++; }
-		Assert(nFree == freeNodes.Len());
+		}
+		if (nFree != freeNodes.Len()) {
+			Assert(nFree == freeNodes.Len());
+		}
 		nodes.Clr(); freeNodes.Clr(); }
 
 	// Dummy method for compatibility with TBtreeNodeMemStore_Paranoid.
@@ -1081,12 +1083,12 @@ public:
 	}
 
 	void Clr() {
-		int nUsed = 0, nFree = 0;
+		int nFree = 0;
 		for (TNodeId node = 0; node < nodes.Len(); node++) {
 			if (nodes[node].Empty()) { nFree++; continue; }
 			IAssert(nodes[node]->nodeId == node);
 			IAssert(nodes[node]->checkedOut == 0);
-			nUsed++; }
+		}
 		IAssert(nFree == freeNodes.Len());
 		nodes.Clr(); freeNodes.Clr(); }
 

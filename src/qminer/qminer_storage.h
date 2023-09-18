@@ -530,6 +530,9 @@ public:
     void SerializeUpdateInPlace(const PJsonVal& RecVal,
         TThinMIn MIn, const TWPt<TStore>& Store, TIntSet& ChangedFieldIdSet);
 
+    /// Delete TOAST-ed values
+    void DeleteToast(const TMemBase& RecMem);
+
     /// Check if field inside this serializator
     bool IsFieldId(const int& FieldId) const { return FieldIdToSerialDescIdH.IsKey(FieldId); }
     /// Check if field is in fixed part

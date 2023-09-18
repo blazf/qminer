@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2015, Jozef Stefan Institute, Quintelligence d.o.o. and contributors
  * All rights reserved.
- * 
+ *
  * This source code is licensed under the FreeBSD license found in the
  * LICENSE file in the root directory of this source tree.
  */
@@ -64,7 +64,7 @@ bool TSIn::GetNextLn(TChA& LnChA){
 }
 
 TStr TSIn::GetSNm() const {
-  return "Input-Stream"; 
+  return "Input-Stream";
 }
 
 const PSIn TSIn::StdIn=PSIn(new TStdIn());
@@ -150,7 +150,7 @@ int TSOut::PutStrFmt(const char *FmtStr, ...){
   va_start(valist, FmtStr);
   const int RetVal=vsnprintf(Bf, 10*1024-2, FmtStr, valist);
   va_end(valist);
-  return RetVal!=-1 ? PutStr(TStr(Bf)) : 0;	
+  return RetVal!=-1 ? PutStr(TStr(Bf)) : 0;
 }
 
 int TSOut::PutStrFmtLn(const char *FmtStr, ...){
@@ -159,7 +159,7 @@ int TSOut::PutStrFmtLn(const char *FmtStr, ...){
   va_start(valist, FmtStr);
   const int RetVal=vsnprintf(Bf, 10*1024-2, FmtStr, valist);
   va_end(valist);
-  return RetVal!=-1 ? PutStrLn(TStr(Bf)) : PutLn();	
+  return RetVal!=-1 ? PutStrLn(TStr(Bf)) : PutLn();
 }
 
 int TSOut::PutIndent(const int& IndentLev){
@@ -220,7 +220,7 @@ TSOut& TSOut::operator<<(TSIn& SIn) {
 }
 
 TStr TSOut::GetSNm() const {
-  return "Output-Stream"; 
+  return "Output-Stream";
 }
 
 const PSOut TSOut::StdOut=PSOut(new TStdOut());
@@ -228,14 +228,14 @@ const PSOut TSOut::StdOut=PSOut(new TStdOut());
 TStdOut::TStdOut(): TSBase(), TSOut(){}
 
 TStr TStdOut::GetSNm() const {
-  return "Standard output"; 
+  return "Standard output";
 }
 
 /////////////////////////////////////////////////
 // Input-Output-Stream-Base
 
 TStr TSInOut::GetSNm() const {
-  return "Input-Output-Stream"; 
+  return "Input-Output-Stream";
 }
 
 /////////////////////////////////////////////////
@@ -396,7 +396,7 @@ bool TFIn::GetNextLnBf(TChA& LnChA) {
   // eof or the last line has no newline
   return !LnChA.Empty();
 }
-    
+
 // Sets BfN to the end of line or end of buffer. Reads more data, if needed.
 // Returns 1, when an end of line was found, BfN is end of line.
 // Returns 0, when an end of line was not found and more data is required,
@@ -443,7 +443,7 @@ int TFIn::FindEol(int& BfN, bool& CrEnd) {
 }
 
 TStr TFIn::GetSNm() const {
-  return SNm; 
+  return SNm;
 }
 
 /////////////////////////////////////////////////
@@ -521,7 +521,7 @@ void TFOut::Flush(){
 }
 
 TStr TFOut::GetSNm() const {
-  return SNm; 
+  return SNm;
 }
 
 /////////////////////////////////////////////////
@@ -663,7 +663,7 @@ bool TMIn::GetNextLnBf(TChA& LnChA){
 }
 
 TStr TMIn::GetSNm() const {
-  return "Input-Memory"; 
+  return "Input-Memory";
 }
 
 /////////////////////////////////////////////////
@@ -671,12 +671,12 @@ TStr TMIn::GetSNm() const {
 void TMOut::Resize(const int& ReqLen){
   IAssert(OwnBf&&(BfL==MxBfL || ReqLen >= 0));
   if (Bf==NULL){
-    IAssert(MxBfL==0); 
+    IAssert(MxBfL==0);
     if (ReqLen < 0) Bf=new char[MxBfL=1024];
     else Bf=new char[MxBfL=ReqLen];
   } else {
     if (ReqLen < 0){ MxBfL*=2; }
-    else if (ReqLen < MxBfL){ return; } // nothing to do 
+    else if (ReqLen < MxBfL){ return; } // nothing to do
     else { MxBfL=(2*MxBfL < ReqLen ? ReqLen : 2*MxBfL); }
     char* NewBf=new char[MxBfL];
     memmove(NewBf, Bf, BfL); delete[] Bf; Bf=NewBf;
@@ -796,7 +796,7 @@ void TMOut::MkEolnLn(){
 }
 
 TStr TMOut::GetSNm() const {
-  return "Output-Memory"; 
+  return "Output-Memory";
 }
 
 /////////////////////////////////////////////////
@@ -1012,13 +1012,13 @@ bool TFile::Exists(const TStr& FNm){
 
 #if defined(GLib_WIN)
 
-void TFile::Copy(const TStr& SrcFNm, const TStr& DstFNm, 
+void TFile::Copy(const TStr& SrcFNm, const TStr& DstFNm,
  const bool& ThrowExceptP, const bool& FailIfExistsP){
   if (ThrowExceptP){
     if (CopyFile(SrcFNm.CStr(), DstFNm.CStr(), FailIfExistsP) == 0) {
         int ErrorCode = (int)GetLastError();
         TExcept::Throw(TStr::Fmt(
-            "Error %d copying file '%s' to '%s'.", 
+            "Error %d copying file '%s' to '%s'.",
             ErrorCode, SrcFNm.CStr(), DstFNm.CStr()));
     }
   } else {
@@ -1110,7 +1110,7 @@ bool TFile::Move(const TStr& SrcFNm, const TStr& DstFNm,
 
 void TFile::Copy(const TStr& SrcFNm, const TStr& DstFNm,
   const bool& ThrowExceptP, const bool& FailIfExistsP) {
-    
+
     FailR("Feature not implemented");
 }
 
@@ -1170,7 +1170,7 @@ TStr TFile::GetUniqueFNm(const TStr& FNm){
 #ifdef GLib_WIN
 
 uint64 TFile::GetSize(const TStr& FNm) {
-    // open 
+    // open
     HANDLE hFile = CreateFile(
        FNm.CStr(),            // file to open
        GENERIC_READ,          // open for reading
@@ -1193,7 +1193,7 @@ uint64 TFile::GetSize(const TStr& FNm) {
 }
 
 uint64 TFile::GetCreateTm(const TStr& FNm) {
-    // open 
+    // open
     HANDLE hFile = CreateFile(
        FNm.CStr(),            // file to open
        GENERIC_READ,          // open for reading
@@ -1212,13 +1212,13 @@ uint64 TFile::GetCreateTm(const TStr& FNm) {
     // close file
     CloseHandle(hFile);
     // convert to uint64
-    TUInt64 UInt64(uint(lpCreationTime.dwHighDateTime), 
+    TUInt64 UInt64(uint(lpCreationTime.dwHighDateTime),
         uint(lpCreationTime.dwLowDateTime));
     return UInt64.Val / uint64(10000);
 }
 
 uint64 TFile::GetLastAccessTm(const TStr& FNm) {
-    // open 
+    // open
     HANDLE hFile = CreateFile(
        FNm.CStr(),            // file to open
        GENERIC_READ,          // open for reading
@@ -1237,13 +1237,13 @@ uint64 TFile::GetLastAccessTm(const TStr& FNm) {
     // close file
     CloseHandle(hFile);
     // convert to uint64
-    TUInt64 UInt64(uint(lpLastAccessTime.dwHighDateTime), 
+    TUInt64 UInt64(uint(lpLastAccessTime.dwHighDateTime),
         uint(lpLastAccessTime.dwLowDateTime));
     return UInt64.Val / uint64(10000);
 }
 
 uint64 TFile::GetLastWriteTm(const TStr& FNm) {
-    // open 
+    // open
     HANDLE hFile = CreateFile(
        FNm.CStr(),            // file to open
        GENERIC_READ,          // open for reading
@@ -1262,7 +1262,7 @@ uint64 TFile::GetLastWriteTm(const TStr& FNm) {
     // close file
     CloseHandle(hFile);
     // convert to uint64
-    TUInt64 UInt64(uint(lpLastWriteTime.dwHighDateTime), 
+    TUInt64 UInt64(uint(lpLastWriteTime.dwHighDateTime),
         uint(lpLastWriteTime.dwLowDateTime));
     return UInt64.Val / uint64(10000);
 }
@@ -1272,7 +1272,7 @@ uint64 TFile::GetLastWriteTm(const TStr& FNm) {
 uint64 TFile::GetSize(const TStr& FNm) {
     struct stat st;
     stat(FNm.CStr(), &st);
-    return (uint64)st.st_size;    
+    return (uint64)st.st_size;
 }
 
 uint64 TFile::GetCreateTm(const TStr& FNm) {
