@@ -181,7 +181,7 @@ typedef enum {
   heBadSearchStr} THttpExCd;
 
 class THttpEx{
-private:
+protected:
   THttpExCd HttpExCd;
 public:
   THttpEx(const THttpExCd& _HttpExCd): HttpExCd(_HttpExCd){}

@@ -286,9 +286,8 @@ TPgBlob::TPgBlobPageItem* TPgBlob::GetItemRec(
         + ItemIndex * sizeof(TPgBlobPageItem));
 }
 
-/// Private constructor
-TPgBlob::TPgBlob(const TStr& _FNm, const TFAccess& _Access,
-    const uint64& CacheSize) {
+/// Constructor
+TPgBlob::TPgBlob(const TStr& _FNm, const TFAccess& _Access, const uint64& CacheSize) {
     EAssertR(CacheSize >= PG_PAGE_SIZE, "Invalid cache size for TPgBlob.");
 
     FNm = _FNm;
@@ -318,7 +317,7 @@ TPgBlob::~TPgBlob() {
     if (Access != TFAccess::faRdOnly) {
         for (int i = 0; i < LoadedPages.Len(); i++) {
             if (ShouldSavePage(i)) {
-                LoadedPage& a = LoadedPages[i];
+                TLoadedPage& a = LoadedPages[i];
                 Files[a.Pt.GetFIx()]->SavePage(a.Pt.GetPg(), GetPageBf(i));
             }
         }
@@ -350,7 +349,7 @@ void TPgBlob::LoadMain() {
 
 /// remove given page from LRU list
 void TPgBlob::UnlistFromLru(int Pg) {
-    LoadedPage& Page = LoadedPages[Pg];
+    TLoadedPage& Page = LoadedPages[Pg];
     if (LruFirst == Pg) {
         LruFirst = Page.LruNext;
     }
@@ -367,7 +366,7 @@ void TPgBlob::UnlistFromLru(int Pg) {
 
 /// insert given (new) page to the start of LRU list
 void TPgBlob::EnlistToStartLru(int Pg) {
-    LoadedPage& Page = LoadedPages[Pg];
+    TLoadedPage& Page = LoadedPages[Pg];
     Page.LruPrev = -1;
     Page.LruNext = LruFirst;
     if (LruFirst >= 0) {
@@ -381,7 +380,7 @@ void TPgBlob::EnlistToStartLru(int Pg) {
 
 /// insert given (new) page to the end of LRU list
 void TPgBlob::EnlistToEndLru(int Pg) {
-    LoadedPage& Page = LoadedPages[Pg];
+    TLoadedPage& Page = LoadedPages[Pg];
     Page.LruPrev = LruLast;
     Page.LruNext = -1;
     if (LruLast >= 0) {
@@ -395,7 +394,7 @@ void TPgBlob::EnlistToEndLru(int Pg) {
 
 /// move given page to the start of LRU list
 void TPgBlob::MoveToStartLru(int Pg) {
-    LoadedPage& Page = LoadedPages[Pg];
+    TLoadedPage& Page = LoadedPages[Pg];
     if (LruFirst < 0) { // empty LRU list
         Page.LruNext = Page.LruPrev = -1;
         LruFirst = LruLast = Pg;
@@ -409,7 +408,7 @@ void TPgBlob::MoveToStartLru(int Pg) {
 
 /// move given page to the end of LRU list - so that it is evicted first
 void TPgBlob::MoveToEndLru(int Pg) {
-    LoadedPage& Page = LoadedPages[Pg];
+    TLoadedPage& Page = LoadedPages[Pg];
     if (LruLast < 0) { // empty LRU list
         Page.LruNext = Page.LruPrev = -1;
         LruFirst = LruLast = Pg;
@@ -430,7 +429,7 @@ int TPgBlob::Evict() {
         }
         Pg = LoadedPages[Pg].LruPrev;
     }
-    LoadedPage& Page = LoadedPages[Pg];
+    TLoadedPage& Page = LoadedPages[Pg];
     UnlistFromLru(Pg);
     LoadedPagesH.DelKey(Page.Pt);
     char* PgPt = GetPageBf(Pg);
@@ -451,14 +450,14 @@ char* TPgBlob::LoadPage(const TPgBlobPgPt& Pt, const bool& LoadData) {
     if ((uint64)LoadedPages.Len() == MxLoadedPages) {
         // evict last page + load new page
         Pg = Evict();
-        LoadedPage& Page = LoadedPages[Pg];
+        TLoadedPage& Page = LoadedPages[Pg];
         if (LoadData) {
             Files[Pt.GetFIx()]->LoadPage(Pt.GetPg(), GetPageBf(Pg));
         }
         Page.Pt = Pt;
         EnlistToStartLru(Pg);
         LoadedPagesH.AddDat(Pt, Pg);
-    } 
+    }
     else {
         // simply load the page
         LastExtentCnt++;
@@ -468,7 +467,7 @@ char* TPgBlob::LoadPage(const TPgBlobPgPt& Pt, const bool& LoadData) {
             LastExtentCnt = 0;
         }
         Pg = LoadedPages.Add();
-        LoadedPage& Page = LoadedPages[Pg];
+        TLoadedPage& Page = LoadedPages[Pg];
         if (LoadData) {
             Files[Pt.GetFIx()]->LoadPage(Pt.GetPg(), GetPageBf(Pg));
         }
@@ -553,7 +552,7 @@ TPgBlobPt TPgBlob::Put(const char* Bf, const int& BfL) {
     if (PgBf == NULL) {
         if (Fsm.FsmGetFreePage(BfL + sizeof(TPgBlobPageItem), PgPt)) {
             PgBf = LoadPage(PgPt);
-        } 
+        }
         else {
             CreateNewPage(PgPt, &PgBf);
             IsNewPage = true;
@@ -595,7 +594,7 @@ TPgBlobPt TPgBlob::Put(const char* Bf, const int& BfL, const TPgBlobPt& Pt) {
         PgH->SetDirty(true);
         return Pt;
 
-    } 
+    }
     else if (ExistingSize + PgH->GetFreeMem() >= BfL + (int)sizeof(TPgBlobPageItem)) {
         // ok, everything can still be inside this page
         DeleteItem(PgBf, Pt.GetIIx());
@@ -603,7 +602,7 @@ TPgBlobPt TPgBlob::Put(const char* Bf, const int& BfL, const TPgBlobPt& Pt) {
         ChangeItem(PgBf, Pt.GetIIx(), Bf, BfL);
         Fsm.FsmUpdatePage(Pt, PgH->GetFreeMem());
         return Pt;
-    } 
+    }
     else {
         // bad luck, we need to move data to new page
         DeleteItem(PgBf, Pt.GetIIx());
@@ -679,7 +678,7 @@ void TPgBlob::PartialFlush(int WndInMsec) {
     TTmStopWatch sw(true);
     for (int i = 0; i < LoadedPages.Len(); i++) {
         if (ShouldSavePage(i)) {
-            LoadedPage& a = LoadedPages[i];
+            TLoadedPage& a = LoadedPages[i];
             Files[a.Pt.GetFIx()]->SavePage(a.Pt.GetPg(), GetPageBf(i));
             if (sw.GetMSec() > WndInMsec) {
                 break;

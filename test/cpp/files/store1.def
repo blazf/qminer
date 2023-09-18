@@ -1,0 +1,46 @@
+[
+	{
+		"name" : "Article",
+		"fields" : [
+			{ "name" : "URI", "type" : "string", "primary" : true },
+			{ "name" : "Url", "type" : "string", "store" : "cache" },
+			{ "name" : "Title", "type" : "string", "store" : "cache" },
+			{ "name" : "Body", "type" : "string", "store" : "cache" }
+		],
+		"joins" : [ ],
+		"keys" : [
+			{ "field" : "Title", "type" : "text_position" },
+			{ "field" : "Body", "type" : "text_position" }
+		],
+		"options": {
+			"type": "paged"
+		}
+	},
+	{
+		"name" : "ArticleMany",
+		"fields" : [
+			{ "name" : "URI", "type" : "string", "primary" : true },
+			{ "name" : "Url", "type" : "string", "store" : "cache" },
+			{ "name" : "Title", "type" : "string", "store" : "cache" },
+			{ "name" : "Body01", "type" : "string", "store" : "cache" },
+			{ "name" : "Body02", "type" : "string", "store" : "cache" },
+			{ "name" : "Body03", "type" : "string", "store" : "cache" },
+			{ "name" : "Body04", "type" : "string", "store" : "cache" },
+			{ "name" : "Body05", "type" : "string", "store" : "cache" },
+			{ "name" : "Body06", "type" : "string", "store" : "cache" },
+			{ "name" : "Body07", "type" : "string", "store" : "cache" },
+			{ "name" : "Body08", "type" : "string", "store" : "cache" },
+			{ "name" : "Body09", "type" : "string", "store" : "cache" },
+			{ "name" : "Body10", "type" : "string", "store" : "cache" }
+		],
+		"joins" : [ ],
+		"keys" : [
+			{ "field" : "Title", "type" : "text_position" },
+			{ "field" : "Body01", "type" : "text_position" }
+		],
+		"options": {
+			"type": "paged"
+		}
+	}
+
+]

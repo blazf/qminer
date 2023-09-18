@@ -13,7 +13,7 @@ TStr TBlobPt::GetStr() const {
     ChA+='[';
     if (Empty()) {
         ChA+="Null";
-    } 
+    }
     else {
         ChA+=TUInt::GetStr(uint(Seg)); ChA+=':'; ChA+=TUInt::GetStr(Addr);
     }
@@ -82,7 +82,7 @@ void TBlobBsUsageStats::PrintStats()
 {
     TNotify::StdNotify->OnStatusFmt("Total used: %.1fMB", TotalUsed / TInt::Mega);
     TNotify::StdNotify->OnStatusFmt("Total free: %.1fMB", TotalFree / TInt::Mega);
-    
+
     TNotify::StdNotify->OnStatus("Used blocks per size:");
     TUIntV KeyV; UsedBlockSizeToCntH.GetKeyV(KeyV);
     KeyV.Sort();
@@ -101,7 +101,7 @@ void TBlobBsUsageStats::PrintStats()
 /////////////////////////////////////////////////
 // Blob-Base
 const int TBlobBs::MnBlobBfL=16;
-const int TBlobBs::MxBlobFLen=2000000000;
+const int TBlobBs::MxBlobFLen=2000000000; // 2G
 
 void TBlobBs::PutVersionStr(const PFRnd& File){
   File->PutStr(GetVersionStr());
@@ -222,7 +222,7 @@ void TBlobBs::GetAllocInfo(const int& BfL, const TIntV& BlockLenV, int& MxBfL, i
     }
     EAssert(BlockLenN<BlockLenV.Len());
     // se the return info for the available size and index
-    MxBfL = BlockLenV[BlockLenN]; 
+    MxBfL = BlockLenV[BlockLenN];
     FFreeBlobPtN = BlockLenN;
 }
 
@@ -297,7 +297,7 @@ TGBlobBs::TGBlobBs(const TStr& BlobBsFNm, const TFAccess& _Access, const int& _M
         // initialize and save the vector of pointers to free blobs
         GenFFreeBlobPtV(BlockLenV, FFreeBlobPtV);
         PutFFreeBlobPtV(File, FFreeBlobPtV);
-    } 
+    }
     else {
         File->SetFPos(0);
         AssertVersionStr(File);
@@ -358,7 +358,7 @@ TBlobPt TGBlobBs::PutBlob(const PSIn& SIn){
             File->PutCh(TCh::NullCh, MxBfL-BfL);
             File->PutCs(Cs);
             PutBlobTag(File, btEnd);
-            
+
 	        Stats.AllocCount++;
 	        Stats.AllocSize += MxBfL;
 	        Stats.AllocUnusedSize += (MxBfL - BfL);
@@ -377,7 +377,7 @@ TBlobPt TGBlobBs::PutBlob(const PSIn& SIn){
         // make sure the block is really free
         AssertBlobState(File, bsFree);
         // deleted blocks are saved as "linked list" - the address of the next free block is stored in the content of next 4 bytes
-        FFreeBlobPtV[FFreeBlobPtN] = TBlobPt::LoadAddr(File); 
+        FFreeBlobPtV[FFreeBlobPtN] = TBlobPt::LoadAddr(File);
         // move the file location back to the place where we start writing the data and save the data
         File->SetFPos(FPos);
         PutBlobState(File, bsActive);
@@ -415,7 +415,7 @@ TBlobPt TGBlobBs::PutBlob(const TBlobPt& BlobPt, const PSIn& SIn, int& ReleasedS
         // that we have space available to fill
         ReleasedSize = DelBlob(BlobPt);
         return PutBlob(SIn);
-    } 
+    }
     else {
         // we are not releasing any data chunk
         ReleasedSize = -1;
@@ -500,7 +500,7 @@ bool TGBlobBs::FNextBlobPt(TBlobPt& TrvBlobPt, TBlobPt& BlobPt, PSIn& BlobSIn){
         if (TrvBlobAddr>=uint(File->GetFLen())) {
             TrvBlobPt.Clr(); BlobPt.Clr(); BlobSIn=NULL;
             return false;
-        } 
+        }
         else {
             File->SetFPos(TrvBlobAddr);
             AssertBlobTag(File, btBegin);
@@ -509,7 +509,7 @@ bool TGBlobBs::FNextBlobPt(TBlobPt& TrvBlobPt, TBlobPt& BlobPt, PSIn& BlobSIn){
             switch (BlobState){
                 case bsActive:{
                     const int BfL = File->GetInt();
-                    TCs BfCs; 
+                    TCs BfCs;
                     BlobSIn = File->GetSIn(BfL, BfCs);
                     File->MoveFPos(MxBfL-BfL);
                     const TCs FCs=File->GetCs();
@@ -523,8 +523,8 @@ bool TGBlobBs::FNextBlobPt(TBlobPt& TrvBlobPt, TBlobPt& BlobPt, PSIn& BlobSIn){
                     AssertBlobTag(File, btEnd);
                     TrvBlobPt=TBlobPt(File->GetFPos());
                     break;
-                default: 
-                    Fail; 
+                default:
+                    Fail;
                     return false;
             }
         }
@@ -540,7 +540,7 @@ void TGBlobBs::ComputeUsageStats(TBlobBsUsageStats& UsageStats)
 {
     TBlobPt BlobPt = GetFirstBlobPt();
     uint Addr = BlobPt.GetAddr();
-    const uint FLen = (uint) File->GetFLen(); 
+    const uint FLen = (uint) File->GetFLen();
     while (Addr < FLen) {
         File->SetFPos(Addr);
         AssertBlobTag(File, btBegin);
@@ -591,8 +591,8 @@ void TMBlobBs::SaveMain() const {
 
 TMBlobBs::TMBlobBs(const TStr& BlobBsFNm, const TFAccess& _Access, const int& _MxSegLen):
     TBlobBs(), Access(_Access), MxSegLen(_MxSegLen), NrFPath(), NrFMid(), SegV() {
-    if (MxSegLen == -1){ 
-        MxSegLen=MxBlobFLen; 
+    if (MxSegLen == -1){
+        MxSegLen=MxBlobFLen;
     }
     // initialize the hashtable of block sizes to first segment
     TBlobBs::GenBlockLenV(BlockLenV);
@@ -606,7 +606,7 @@ TMBlobBs::TMBlobBs(const TStr& BlobBsFNm, const TFAccess& _Access, const int& _M
             TStr SegFNm=GetSegFNm(NrFPath, NrFMid, 0);
             PBlobBs Seg=TGBlobBs::New(SegFNm, faCreate, MxSegLen);
             SegV.Add(Seg);
-            SaveMain(); 
+            SaveMain();
             break; }
         case faUpdate:
         case faRdOnly:{
@@ -714,7 +714,7 @@ TBlobPt TMBlobBs::PutBlob(const TBlobPt& BlobPt, const PSIn& SIn, int& ReleasedS
         // we were not able to save the data in the current segment so we want to store it as a new blob
         // the data in the old blob was already removed
         NewBlobPt = PutBlob(SIn);
-    } 
+    }
     else {
         // remember in which segment we put the blob
         NewBlobPt.PutSeg(BlobPt.GetSeg());
@@ -764,7 +764,7 @@ bool TMBlobBs::FNextBlobPt(TBlobPt& TrvBlobPt, TBlobPt& BlobPt, PSIn& BlobSIn){
 }
 
 bool TMBlobBs::Exists(const TStr& BlobBsFNm){
-    TStr NrFPath; TStr NrFMid; 
+    TStr NrFPath; TStr NrFMid;
     GetNrFPathFMid(BlobBsFNm, NrFPath, NrFMid);
     const TStr MainFNm = GetMainFNm(NrFPath, NrFMid);
     return TFile::Exists(MainFNm);

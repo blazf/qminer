@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2015, Jozef Stefan Institute, Quintelligence d.o.o. and contributors
  * All rights reserved.
- * 
+ *
  * This source code is licensed under the FreeBSD license found in the
  * LICENSE file in the root directory of this source tree.
  */
@@ -9,8 +9,8 @@
 //////////////////////////////////////////////////////////////////////////
 // Classification Results
 TCfyRes::TCfyRes() {
-    AccMom = TMom::New(); PrecMom = TMom::New(); 
-    RecMom = TMom::New(); F1Mom = TMom::New(); 
+    AccMom = TMom::New(); PrecMom = TMom::New();
+    RecMom = TMom::New(); F1Mom = TMom::New();
     BreakEvenPointMom = TMom::New(); AvgPrecMom = TMom::New();
 	const int Folds = 11; DecPrecMomV.Gen(Folds); DecRecMomV.Gen(Folds);
 	for (int FoldN = 0; FoldN < Folds; FoldN++) {
@@ -31,9 +31,9 @@ TCfyRes::TCfyRes(TCountCfyRes& CfyRes) {
     BreakEvenPointMom->Add(CfyRes.BreakEvenPoint());
     BreakEvenPointMom->Def();
 
-	const int Folds = 11; 
+	const int Folds = 11;
 	DecPrecMomV.Gen(Folds); DecRecMomV.Gen(Folds);
-	TFltV DecPrecV, DecRecV; 
+	TFltV DecPrecV, DecRecV;
 	CfyRes.DecPrecRec(DecPrecV, DecRecV);
 	for (int FoldN = 0; FoldN < Folds; FoldN++) {
 		DecPrecMomV[FoldN] = TMom::New();
@@ -45,14 +45,14 @@ TCfyRes::TCfyRes(TCountCfyRes& CfyRes) {
 	}
 
 	CfyRes.DecRoc(LastRocV);
-}; 
+};
 
 void TCfyRes::Add(TCfyRes& CfyRes) {
     AccMom->Add(CfyRes.Acc()); PrecMom->Add(CfyRes.Prec());
     RecMom->Add(CfyRes.Rec()); F1Mom->Add(CfyRes.F1());
     BreakEvenPointMom->Add(CfyRes.BreakEvenPoint());
     AvgPrecMom->Add(CfyRes.AvgPrec());
-	const int Folds = DecPrecMomV.Len(); 
+	const int Folds = DecPrecMomV.Len();
 	for (int FoldN = 0; FoldN < Folds; FoldN++) {
 		DecPrecMomV[FoldN]->Add(CfyRes.PrecDec(FoldN));
 		DecRecMomV[FoldN]->Add(CfyRes.RecDec(FoldN));
@@ -63,7 +63,7 @@ void TCfyRes::Add(TCfyRes& CfyRes) {
 void TCfyRes::Def() {
     AccMom->Def(); PrecMom->Def(); RecMom->Def();
     F1Mom->Def(); BreakEvenPointMom->Def(); AvgPrecMom->Def();
-	const int Folds = DecPrecMomV.Len(); 
+	const int Folds = DecPrecMomV.Len();
 	for (int FoldN = 0; FoldN < Folds; FoldN++) {
 		DecPrecMomV[FoldN]->Def();
 		DecRecMomV[FoldN]->Def();
@@ -76,7 +76,7 @@ TStr TCfyRes::GetStatStr(const TStr& Desc) {
         100.0*Prec(), 100.0*PrecStDiv(), 100.0*Rec(), 100.0*RecStDiv(), 100.0*F1(), 100.0*F1StDiv());
     StatStr += TStr::Fmt("acc: [%5.2f%%,%5.2f%%] avgprec: [%5.2f%%,%5.2f%%] BEP:[%5.2f%%,%5.2f%%]\n",
         100.0*Acc(), 100.0*AccStDiv(), 100.0*AvgPrec(), 100.0*AvgPrecStDiv(), 100.0*BreakEvenPoint(), 100.0*BreakEvenPointStDiv());
-	//const int Folds = DecPrecMomV.Len(); 
+	//const int Folds = DecPrecMomV.Len();
 	//StatStr += "Prec:";
 	//for (int FoldN = 0; FoldN < Folds; FoldN++) {
 	//	StatStr += (FoldN % 4 == 0) ? "\n" : " ";
@@ -109,9 +109,9 @@ void TCfyRes::PrTabVals(PSOut SOut, const TStr& Nm) {
     SOut->PutFlt(Rec()); SOut->PutCh('\t'); SOut->PutFlt(RecStDiv()); SOut->PutCh('\t');
     SOut->PutFlt(F1()); SOut->PutCh('\t'); SOut->PutFlt(F1StDiv()); SOut->PutCh('\t');
     SOut->PutFlt(Acc()); SOut->PutCh('\t'); SOut->PutFlt(AccStDiv()); SOut->PutCh('\t');
-    SOut->PutFlt(BreakEvenPoint()); SOut->PutCh('\t'); SOut->PutFlt(BreakEvenPointStDiv()); 
+    SOut->PutFlt(BreakEvenPoint()); SOut->PutCh('\t'); SOut->PutFlt(BreakEvenPointStDiv());
     for (int StatN = 0; StatN < GetStats(); StatN++) {
-        SOut->PutCh('\t'); SOut->PutFlt(GetStatWgt(StatN)); }    
+        SOut->PutCh('\t'); SOut->PutFlt(GetStatWgt(StatN)); }
     SOut->PutCh('\n');
 }
 
@@ -119,8 +119,8 @@ void TCfyRes::PrTabVals(PSOut SOut, const TStr& Nm) {
 // Count -- Classification Results
 void TCountCfyRes::GetDec(const TFltV& ValV, TFltV& DecValV) {
 	const int Folds = 10, Vals = ValV.Len(); DecValV.Gen(Folds + 1);
-	for (int Fold = 0; Fold <= Folds; Fold++) { 
-		const int ValN = TInt::GetMn(Vals-1, 
+	for (int Fold = 0; Fold <= Folds; Fold++) {
+		const int ValN = TInt::GetMn(Vals-1,
 			TFlt::Round((double(Fold) / double(Folds)) * double(Vals)));
 		DecValV[Fold] = ValV[ValN];
 	}
@@ -128,8 +128,8 @@ void TCountCfyRes::GetDec(const TFltV& ValV, TFltV& DecValV) {
 
 void TCountCfyRes::GetDec(const TFltPrV& ValV, TFltPrV& DecValV) {
 	const int Folds = 10, Vals = ValV.Len(); DecValV.Gen(Folds + 1);
-	for (int Fold = 0; Fold <= Folds; Fold++) { 
-		const int ValN = TInt::GetMn(Vals-1, 
+	for (int Fold = 0; Fold <= Folds; Fold++) {
+		const int ValN = TInt::GetMn(Vals-1,
 			TFlt::Round((double(Fold) / double(Folds)) * double(Vals)));
 		DecValV[Fold] = ValV[ValN];
 	}
@@ -149,10 +149,10 @@ TCfyRes TCountCfyRes::ToMacroTCfyRes(TVec<TCountCfyRes>& CfyResV) {
 void TCountCfyRes::Add(const double& PredCls, const double& TrueCls) {
 	ResultV.Add(TFltKd(PredCls, TrueCls));
 	ResultVSorted = false;
-	if (TrueCls > 0.0) { 
+	if (TrueCls > 0.0) {
         if (PredCls > 0.0) { TPos++; }
         else { FNeg++; }
-	} else if (TrueCls < 0.0) { 
+	} else if (TrueCls < 0.0) {
         if (PredCls < 0.0) { TNeg++; }
         else { FPos++; }
     } else { Fail; }
@@ -176,8 +176,8 @@ double TCountCfyRes::AvgPrec() {
 double TCountCfyRes::BreakEvenPoint() {
 	PrepareResultV();
     const int Len = ResultV.Len();
-    int TP = 0, FP = 0, TN = FPos + TNeg, FN = TPos + FNeg;
-    double Prec = 1.0, Rec = 0.0, Diff = 1.0, BEP = 0.0; 
+    int TP = 0, FP = 0, FN = TPos + FNeg;
+    double Prec = 1.0, Rec = 0.0, Diff = 1.0, BEP = 0.0;
 
     for (int i = 0; i < Len; i++) {
         if (Diff > TFlt::Abs(Prec - Rec) && Prec != 0.0 && Rec != 0.0) {
@@ -187,9 +187,9 @@ double TCountCfyRes::BreakEvenPoint() {
         if (ResultV[i].Dat > 0.0) {
             FN--; TP++;
         } else {
-            TN--; FP++; 
+            FP++;
         }
-        Prec = (double)TP/(TP+FP); 
+        Prec = (double)TP/(TP+FP);
         Rec = (double)TP/(TP+FN);
     }
 
@@ -199,14 +199,14 @@ double TCountCfyRes::BreakEvenPoint() {
 void TCountCfyRes::PrecRec(TFltV& PrecV, TFltV& RecV) {
 	PrepareResultV();
     const int Len = ResultV.Len();
-    int TP = 0, FP = 0, TN = FPos + TNeg, FN = TPos + FNeg;
-    double Prec = 1.0, Rec = 0.0; 
+    int TP = 0, FP = 0, FN = TPos + FNeg;
+    double Prec = 1.0, Rec = 0.0;
     PrecV.Gen(Len+1, 0); RecV.Gen(Len+1,0);
 
     PrecV.Add(Prec); RecV.Add(Rec);
     for (int i = 0; i < Len; i++) {
         if (ResultV[i].Dat > 0.0) { FN--; TP++; }
-        else { TN--; FP++; }
+        else { FP++; }
         Prec = (double)TP/(TP+FP); Rec = (double)TP/(TP+FN);
         PrecV.Add(Prec); RecV.Add(Rec);
     }
@@ -218,7 +218,7 @@ void TCountCfyRes::DecPrecRec(TFltV& DecPrecV, TFltV& DecRecV) {
 }
 
 void TCountCfyRes::Roc(TFltPrV& RocV) {
-	PrepareResultV(); 
+	PrepareResultV();
     const int Len = ResultV.Len(); RocV.Gen(Len, 0);
     int TP = 0, FP = 0, TN = FPos + TNeg, FN = TPos + FNeg;
     for (int i = 0; i < Len; i++) {

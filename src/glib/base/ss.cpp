@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2015, Jozef Stefan Institute, Quintelligence d.o.o. and contributors
  * All rights reserved.
- * 
+ *
  * This source code is licensed under the FreeBSD license found in the
  * LICENSE file in the root directory of this source tree.
  */
@@ -237,7 +237,7 @@ void TSs::LoadTxtFldV(
  const TSsFmt& SsFmt, const PSIn& SIn, char& Ch,
  TStrV& FldValV, const bool& IsExcelEoln, const bool& IsQStr){
   if (!SIn->Eof()){
-    FldValV.Clr(false); int X=0;
+    FldValV.Clr(false);
     if (Ch==TCh::NullCh){Ch=SIn->GetCh();}
     TChA ChA;
     while (!SIn->Eof()){
@@ -293,16 +293,16 @@ void TSs::LoadTxtFldV(
         break;
       } else
       if ((SsFmt==ssfTabSep)&&(Ch=='\t')){
-        X++; Ch=SIn->GetCh();
+        Ch=SIn->GetCh();
       } else
       if ((SsFmt==ssfCommaSep)&&(Ch==',')){
-        X++; Ch=SIn->GetCh();
+        Ch=SIn->GetCh();
       } else
       if ((SsFmt==ssfSemicolonSep)&&(Ch==';')){
-        X++; Ch=SIn->GetCh();
+        Ch=SIn->GetCh();
       } else
       if ((SsFmt==ssfVBar)&&(Ch=='|')){
-        X++; Ch=SIn->GetCh();
+        Ch=SIn->GetCh();
       } else
       if (Ch=='\r'){
         Ch=SIn->GetCh();
@@ -310,7 +310,7 @@ void TSs::LoadTxtFldV(
         break;
       } else
       if (Ch=='\n'){
-        X=0; Ch=SIn->GetCh();
+        Ch=SIn->GetCh();
         if ((Ch=='\r')&&(!SIn->Eof())){Ch=SIn->GetCh();}
         break;
       } else {
@@ -358,7 +358,7 @@ TStr TSs::GetSsFmtNmVStr(){
 // Fast-Spread-Sheet-Parser
 const char TSsParser::QUOTE_CH = '"';
 
-TSsParser::TSsParser(const TStr& FNm, const TSsFmt _SsFmt, const bool& _SkipLeadBlanks, const bool& _SkipCmt, const bool& _SkipEmptyFld) : SsFmt(_SsFmt), 
+TSsParser::TSsParser(const TStr& FNm, const TSsFmt _SsFmt, const bool& _SkipLeadBlanks, const bool& _SkipCmt, const bool& _SkipEmptyFld) : SsFmt(_SsFmt),
  SkipLeadBlanks(_SkipLeadBlanks), SkipCmt(_SkipCmt), SkipEmptyFld(_SkipEmptyFld), LineCnt(0), /*Bf(NULL),*/ SplitCh('\t'), LineStr(), FldV(), FInPt(NULL) {
   if (TZipIn::IsZipExt(FNm.GetFExt())) { FInPt = TZipIn::New(FNm); }
   else { FInPt = TFIn::New(FNm); }
@@ -408,7 +408,7 @@ bool TSsParser::NextSlow() { // split on SplitCh
   }
   char *last = cur;
   while (*cur) {
-    if (SsFmt == ssfWhiteSep) { while (*cur && ! TCh::IsWs(*cur)) { cur++; } } 
+    if (SsFmt == ssfWhiteSep) { while (*cur && ! TCh::IsWs(*cur)) { cur++; } }
     else {
     	while (*cur) {
 			if (*cur == QUOTE_CH) {
@@ -431,7 +431,7 @@ bool TSsParser::NextSlow() { // split on SplitCh
   }
   FldV.Add(last);  // add last field
   if (SkipEmptyFld && FldV.Empty()) { return NextSlow(); } // skip empty lines
-  return true; 
+  return true;
 }
 
 // Gets and parses the next line, quick version, works with buffers, not chars.
@@ -450,7 +450,7 @@ bool TSsParser::Next() { // split on SplitCh
   }
   char *last = cur;
   while (*cur) {
-    if (SsFmt == ssfWhiteSep) { while (*cur && ! TCh::IsWs(*cur)) { cur++; } } 
+    if (SsFmt == ssfWhiteSep) { while (*cur && ! TCh::IsWs(*cur)) { cur++; } }
     else {
     	while (*cur) {
 			if (*cur == QUOTE_CH) {
@@ -473,7 +473,7 @@ bool TSsParser::Next() { // split on SplitCh
   }
   FldV.Add(last);  // add last field
   if (SkipEmptyFld && FldV.Empty()) { return Next(); } // skip empty lines
-  return true; 
+  return true;
 }
 
 void TSsParser::ToLc() {
@@ -492,9 +492,9 @@ bool TSsParser::GetInt(const int& FldN, int& Val) const {
   if (*c=='-') { Minus=true; c++; }
   if (! TCh::IsNum(*c)) { return false; }
   _Val = TCh::GetNum(*c);  c++;
-  while (TCh::IsNum(*c)){ 
-    _Val = 10 * _Val + TCh::GetNum(*c); 
-    c++; 
+  while (TCh::IsNum(*c)){
+    _Val = 10 * _Val + TCh::GetNum(*c);
+    c++;
   }
   if (Minus) { _Val = -_Val; }
   if (*c != 0) { return false; }

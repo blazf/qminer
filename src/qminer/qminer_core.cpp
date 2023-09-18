@@ -611,7 +611,7 @@ TIntV TStore::GetFieldIdV(const TFieldType& Type) {
 }
 
 void TStore::AddTrigger(const PStoreTrigger& Trigger) {
-    TEnv::Logger->OnStatusFmt("Adding trigger to store %s", GetStoreNm().CStr());
+    if (TEnv::Verbosity >= 1) { TEnv::Logger->OnStatusFmt("Adding trigger to store %s", GetStoreNm().CStr()); }
     Trigger->Init(this);
     TriggerV.Add(Trigger);
 }
@@ -5148,7 +5148,7 @@ TQueryItem::TQueryItem(const TWPt<TBase>& Base, const TStr& StoreNm, const TStr&
     QmAssertR(Base->GetIndexVoc()->IsKeyNm(StoreId, KeyNm), "Unknown Key Name: " + KeyNm);
     KeyId = Base->GetIndexVoc()->GetKeyId(StoreId, KeyNm);
     // make sure all the specified word ids are valid
-    for (const uint64& WordId : WordIdV) {
+    for (const uint64 WordId : WordIdV) {
         QmAssertR(Base->GetIndexVoc()->IsWordId(KeyId, WordId), "Unknown word id");
     }
     WordIdV = _WordIdV;
@@ -5596,7 +5596,7 @@ bool TIndex::TQmGixItemPos::Add(const int& Pos) {
 }
 
 // compute the intersection of the current item (this) and Item, where the maximum allowed difference in
-// positions is MaxDiff. If MaxDiff value is negative we have a match if Item pos is on the left or right of 
+// positions is MaxDiff. If MaxDiff value is negative we have a match if Item pos is on the left or right of
 // a position in this
 TIndex::TQmGixItemPos TIndex::TQmGixItemPos::Intersect(const TQmGixItemPos& Item, const int& MaxDiff, int& TotalMatchingDiff) const {
     // first remember the length of boths items
