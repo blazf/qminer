@@ -1153,7 +1153,6 @@ void TRecSerializator::SetFieldTmMSecs(char* Bf, const int& BfL, const int& Fiel
     SetFieldTmMSecs(Bf, BfL, GetFieldSerialDesc(FieldId), TmMSecs);
 }
 
-
 /// Destructor that calls parent
 TRecSerializator::TToastWatcher::~TToastWatcher() {
     for (int i = 0; i < Parent->ToastPtToDel.Len(); i++) {
@@ -1191,7 +1190,7 @@ void TRecSerializator::CheckToastDel(const TMemBase& InRecMem, const TFieldSeria
                 TPgBlobPt Pt;
                 Pt = *((TPgBlobPt*)Bf);
                 ToastPtToDel.Add(Pt);
-                //Store->DelToastVal(Pt);
+                Toaster->DelToastVal(Pt);
             }
         }
     }
@@ -1641,6 +1640,16 @@ void TRecSerializator::SerializeUpdate(const PJsonVal& RecVal, const TMemBase& I
 
     // merge fixed and variable parts for final result
     Merge(FixedMem, VarSOut, OutRecMem);
+}
+
+void TRecSerializator::DeleteToast(const TMemBase& RecMem) {
+    if (UseToast) {
+        for (int FieldSerialDescId = 0; FieldSerialDescId < FieldSerialDescV.Len(); FieldSerialDescId++) {
+            const TFieldSerialDesc& FieldSerialDesc = FieldSerialDescV[FieldSerialDescId];
+
+            CheckToastDel(RecMem, FieldSerialDesc);
+        }
+    }
 }
 
 bool TRecSerializator::IsFieldNull(TThinMIn& min, const int& FieldId) const {
@@ -5140,6 +5149,7 @@ void TStorePbBlob::DeleteRecs(const TUInt64V& DelRecIdV, const int& MxTimeMSecs,
             TPgBlobPt Pt = RecIdBlobPtH.GetDat(DelRecId);
             TMemBase CacheRecMem = DataBlob->GetMemBase(Pt);
             RecIndexer.DeindexRec(CacheRecMem, DelRecId, *SerializatorCache);
+            SerializatorCache->DeleteToast(CacheRecMem);
             DataBlob->Del(Pt);
             RecIdBlobPtH.DelKey(DelRecId);
         }
@@ -5147,6 +5157,7 @@ void TStorePbBlob::DeleteRecs(const TUInt64V& DelRecIdV, const int& MxTimeMSecs,
             TPgBlobPt Pt = RecIdBlobPtHMem.GetDat(DelRecId);
             TMemBase RecMem = DataMem->GetMemBase(Pt);
             RecIndexer.DeindexRec(RecMem, DelRecId, *SerializatorMem);
+            SerializatorMem->DeleteToast(RecMem);
             DataMem->Del(Pt);
             RecIdBlobPtHMem.DelKey(DelRecId);
         }
