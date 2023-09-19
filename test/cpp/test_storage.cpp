@@ -15,6 +15,10 @@ PJsonVal MakeArticleSmall(const int& Id) {
     ArticleVal->AddToObj("Url", "The Url");
     ArticleVal->AddToObj("Title", "The Title");
     ArticleVal->AddToObj("Body", "The Body");
+    ArticleVal->AddToObj("int_v", TJsonVal::NewArr(TIntV::GetV(1, 2, 3)));
+    ArticleVal->AddToObj("string", "tralala");
+    ArticleVal->AddToObj("string_v", TJsonVal::NewArr(TStrV::GetV("a", "b", "c")));
+    ArticleVal->AddToObj("float_v", TJsonVal::NewArr(TFltV::GetV(1.0, 2.0, 3.0)));
     return ArticleVal;
 }
 
@@ -31,6 +35,10 @@ PJsonVal MakeArticleBig(const int& Id, const int& FieldLen) {
     ArticleVal->AddToObj("Url", FieldStr);
     ArticleVal->AddToObj("Title", FieldStr);
     ArticleVal->AddToObj("Body", FieldStr);
+    ArticleVal->AddToObj("int_v", TJsonVal::NewArr(TIntV::GetV(1, 2, 3)));
+    ArticleVal->AddToObj("string", "tralala");
+    ArticleVal->AddToObj("string_v", TJsonVal::NewArr(TStrV::GetV("a", "b", "c")));
+    ArticleVal->AddToObj("float_v", TJsonVal::NewArr(TFltV::GetV(1.0, 2.0, 3.0)));
     return ArticleVal;
 }
 
@@ -64,7 +72,7 @@ TEST(TInit) {
 }
 
 TEST(TStore1) {
-    return;
+    // return;
 
     TStr StoreJsonFNm = "./test/cpp/files/store1.def";
     PJsonVal StoreDefVal = TJsonVal::GetValFromStr(TStr::LoadTxt(StoreJsonFNm));
@@ -72,10 +80,10 @@ TEST(TStore1) {
     int ArticleId = 0;
     uint64 Records = 0;
     const int ArticleFieldLen = 1000;
-    const int Recs = 100000;
+    const int Recs = 10000;
     const double PercDelete = 0.5;
     const double PercAdd = 1.0;
-    const int Iters = 100;
+    const int Iters = 10;
 
     try {
         PBase Base = NewBase("./test/cpp/data/", StoreDefVal, IndexCacheSize,
@@ -98,6 +106,30 @@ TEST(TStore1) {
 
     for (int IterN = 0; IterN < Iters; IterN++) {
         printf("Iter: %d\n", IterN);
+
+        try {
+            PBase Base = LoadBase("./test/cpp/data/", faUpdate, IndexCacheSize,
+                StoreCacheSize, TStrUInt64H(), TStrUInt64H(), false, 128);
+            PStore ArticleStore = Base->GetStoreByStoreNm("Article");
+
+            PRecSet UpdateSet = ArticleStore->GetRndRecs((int)(PercDelete * Recs));
+            TUInt64V UpdateRecIdV; UpdateSet->GetRecIdV(UpdateRecIdV);
+            const TStr Field1Str = MakeStr(ArticleFieldLen + 1);
+            const TStr Field2Str = MakeStr(ArticleFieldLen - 1);
+            for (const uint64 RecId : UpdateRecIdV) {
+                ArticleStore->SetFieldNmStr(RecId, "Title", Field1Str);
+                ArticleStore->SetFieldNmStr(RecId, "Body", Field2Str);
+                ArticleStore->SetFieldNmNull(RecId, "string");
+                ArticleStore->SetFieldNmNull(RecId, "int_v");
+                ArticleStore->SetFieldNmStr(RecId, "string", "tralala");
+            }
+
+            Records = ArticleStore->GetRecs();
+            SaveBase(Base);
+        } catch (PExcept Except) {
+            printf("Exception: %s\n", Except->GetMsgStr().CStr());
+        }
+        printf("File size: %.0fMB  ...  %.1fx\n", FileSize() / (1024.0*1024.0), (FileSize() / Records) / RecSize);
 
         try {
             PBase Base = LoadBase("./test/cpp/data/", faUpdate, IndexCacheSize,
@@ -137,8 +169,6 @@ TEST(TStore1) {
 
 
 TEST(TStore2) {
-    return;
-
     TStr StoreJsonFNm = "./test/cpp/files/store1.def";
     PJsonVal StoreDefVal = TJsonVal::GetValFromStr(TStr::LoadTxt(StoreJsonFNm));
 
@@ -172,8 +202,6 @@ TEST(TStore2) {
 }
 
 TEST(TStore3) {
-    return;
-
     TStr StoreJsonFNm = "./test/cpp/files/store1.def";
     PJsonVal StoreDefVal = TJsonVal::GetValFromStr(TStr::LoadTxt(StoreJsonFNm));
 
@@ -190,4 +218,142 @@ TEST(TStore3) {
     } catch (PExcept Except) {
         printf("Exception: %s\n", Except->GetMsgStr().CStr());
     }
+}
+
+TEST(TStore4) {
+    TStr StoreJsonFNm = "./test/cpp/files/store1.def";
+    PJsonVal StoreDefVal = TJsonVal::GetValFromStr(TStr::LoadTxt(StoreJsonFNm));
+
+    try {
+        PBase Base = NewBase("./test/cpp/data/", StoreDefVal, IndexCacheSize,
+            StoreCacheSize, true, TStrUInt64H(), TStrUInt64H(), false, 128, true);
+        PStore ArticleStore = Base->GetStoreByStoreNm("Article");
+
+        const int ArticleId = ArticleStore->AddRec(MakeArticleBig(123, 10000));
+
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(1));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(11));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(111));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(1111));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(11111));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(1111));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(111));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(11));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(1));
+
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C", "D"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C", "D", "E"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C", "D"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A"));
+
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3, 4));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3, 4, 5));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3, 4));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1));
+
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0, 4.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0, 4.0, 5.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0, 4.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0));
+
+        printf("Records: %d\n", (int)ArticleStore->GetRecs());
+
+        SaveBase(Base);
+    } catch (PExcept Except) {
+        printf("Exception: %s\n", Except->GetMsgStr().CStr());
+    }
+
+    try {
+        PBase Base = LoadBase("./test/cpp/data/", faUpdate, IndexCacheSize,
+            StoreCacheSize, TStrUInt64H(), TStrUInt64H(), false, 128);
+        PStore ArticleStore = Base->GetStoreByStoreNm("Article");
+
+        const uint64 ArticleId = 0;
+
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(1));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(11));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(111));
+        ArticleStore->SetFieldNmNull(ArticleId, "string");
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(1111));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(11111));
+        ArticleStore->SetFieldNmNull(ArticleId, "string");
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(1111));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(111));
+        ArticleStore->SetFieldNmNull(ArticleId, "string");
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(11));
+        ArticleStore->SetFieldNmStr(ArticleId, "string", MakeStr(1));
+
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B"));
+        ArticleStore->SetFieldNmNull(ArticleId, "string_v");
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C", "D"));
+        ArticleStore->SetFieldNmNull(ArticleId, "string_v");
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C", "D", "E"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C", "D"));
+        ArticleStore->SetFieldNmNull(ArticleId, "string_v");
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B", "C"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A", "B"));
+        ArticleStore->SetFieldNmStrV(ArticleId, "string_v", TStrV::GetV("A"));
+
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2));
+        ArticleStore->SetFieldNmNull(ArticleId, "int_v");
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3, 4));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3, 4, 5));
+        ArticleStore->SetFieldNmNull(ArticleId, "int_v");
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3, 4));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2, 3));
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1, 2));
+        ArticleStore->SetFieldNmNull(ArticleId, "int_v");
+        ArticleStore->SetFieldNmIntV(ArticleId, "int_v", TIntV::GetV(1));
+
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0));
+        ArticleStore->SetFieldNmNull(ArticleId, "float_v");
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0));
+        ArticleStore->SetFieldNmNull(ArticleId, "float_v");
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0, 4.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0, 4.0, 5.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0, 4.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0, 3.0));
+        ArticleStore->SetFieldNmNull(ArticleId, "float_v");
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0, 2.0));
+        ArticleStore->SetFieldNmFltV(ArticleId, "float_v", TFltV::GetV(1.0));
+
+        SaveBase(Base);
+    } catch (PExcept Except) {
+        printf("Exception: %s\n", Except->GetMsgStr().CStr());
+    }
+
+    try {
+        PBase Base = LoadBase("./test/cpp/data/", faUpdate, IndexCacheSize,
+            StoreCacheSize, TStrUInt64H(), TStrUInt64H(), false, 128);
+        PStore ArticleStore = Base->GetStoreByStoreNm("Article");
+
+        TUInt64V DelRecIdV; ArticleStore->GetAllRecs()->GetRecIdV(DelRecIdV);
+        ArticleStore->DeleteRecs(DelRecIdV);
+        printf("Records: %d\n", (int)ArticleStore->GetRecs());
+
+        SaveBase(Base);
+    } catch (PExcept Except) {
+        printf("Exception: %s\n", Except->GetMsgStr().CStr());
+    }
+
 }

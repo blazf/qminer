@@ -5,7 +5,11 @@
 			{ "name" : "URI", "type" : "string", "primary" : true },
 			{ "name" : "Url", "type" : "string", "store" : "cache" },
 			{ "name" : "Title", "type" : "string", "store" : "cache" },
-			{ "name" : "Body", "type" : "string", "store" : "cache" }
+			{ "name" : "Body", "type" : "string", "store" : "cache" },
+			{ "name" : "int_v", "type": "int_v", "store" : "cache", "null": true },
+			{ "name" : "string", "type": "string", "store" : "cache", "null": true },
+			{ "name" : "string_v", "type": "string_v", "store" : "cache", "null": true },
+			{ "name" : "float_v", "type": "float_v", "store" : "cache", "null": true }
 		],
 		"joins" : [ ],
 		"keys" : [
