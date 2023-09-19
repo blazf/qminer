@@ -1190,7 +1190,6 @@ void TRecSerializator::CheckToastDel(const TMemBase& InRecMem, const TFieldSeria
                 TPgBlobPt Pt;
                 Pt = *((TPgBlobPt*)Bf);
                 ToastPtToDel.Add(Pt);
-                Toaster->DelToastVal(Pt);
             }
         }
     }
@@ -1644,6 +1643,7 @@ void TRecSerializator::SerializeUpdate(const PJsonVal& RecVal, const TMemBase& I
 
 void TRecSerializator::DeleteToast(const TMemBase& RecMem) {
     if (UseToast) {
+        TToastWatcher Watcher(this); // to delay deletion of old TOASTS
         for (int FieldSerialDescId = 0; FieldSerialDescId < FieldSerialDescV.Len(); FieldSerialDescId++) {
             const TFieldSerialDesc& FieldSerialDesc = FieldSerialDescV[FieldSerialDescId];
 
@@ -1958,6 +1958,7 @@ PJsonVal TRecSerializator::GetFieldJsonVal(const TMemBase& RecMem, const int& Fi
 }
 
 void TRecSerializator::SetFieldNull(const TMemBase& InRecMem, TMem& OutRecMem, const int& FieldId) {
+    TToastWatcher Watcher(this); // to delay deletion of old TOASTS
     // different handling for fixed and variable fields
     const TFieldSerialDesc& FieldSerialDesc = GetFieldSerialDesc(FieldId);
     if (FieldSerialDesc.FixedPartP) {
@@ -2272,7 +2273,7 @@ void TRecSerializator::SetFieldTMem(const TMemBase& InRecMem,
     TMem& OutRecMem, const int& FieldId, const TMem& Mem) {
 
     TToastWatcher Watcher(this); // to delay deletion of old TOASTS
-                                 // split to fixed and variable parts
+    // split to fixed and variable parts
     TMem FixedMem; TMOut VarSOut; ExtractFixedMem(InRecMem, FixedMem);
     // iterate over fields and serialize them
     for (int FieldSerialDescId = 0; FieldSerialDescId < FieldSerialDescV.Len(); FieldSerialDescId++) {
@@ -2297,7 +2298,7 @@ void TRecSerializator::SetFieldJsonVal(const TMemBase& InRecMem,
     TMem& OutRecMem, const int& FieldId, const PJsonVal& Json) {
 
     TToastWatcher Watcher(this); // to delay deletion of old TOASTS
-                                 // split to fixed and variable parts
+    // split to fixed and variable parts
     TMem FixedMem; TMOut VarSOut; ExtractFixedMem(InRecMem, FixedMem);
     // iterate over fields and serialize them
     for (int FieldSerialDescId = 0; FieldSerialDescId < FieldSerialDescV.Len(); FieldSerialDescId++) {
