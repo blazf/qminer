@@ -169,7 +169,7 @@ protected:
   void OnFetch(const int& FId, const PWebPg& _WebPg){Ok=true;}
   void OnError(const int& FId, const TStr& _MsgStr){Ok=false;}
 public:
-  TWebFetchSendBatchJson() {NumSent = 0;};
+  TWebFetchSendBatchJson() { MSecInterval = 0; BatchSize = 0; LastRestart = 0; Ok = false; NumSent = 0; };
   TWebFetchSendBatchJson(const TStr& UrlStr_);
   void SetBatchSize(const int& BatchSize_);
   void SetMSecInterval(const int& MSecInterval_);
