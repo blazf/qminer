@@ -445,7 +445,7 @@ void TReplaySrv::OnHttpRq(const uint64& SockId, const PHttpRq& HttpRq)
     if (!SOut.Empty()) {
         try {
             PUrl HttpRqUrl = HttpRq->GetUrl();
-            TStr FunNm = HttpRqUrl->GetPathSeg(0);
+            const TStr FunNm = HttpRqUrl->GetPathSegs() > 0 ? HttpRqUrl->GetPathSeg(0) : "";
             if (LoggingFunNmH.IsKey(FunNm)) {
                 THttpReqSerInfo ReqInfo(HttpRq);
                 ReqInfo.Save(*SOut);
@@ -473,7 +473,7 @@ void TReplaySrv::ReplayHttpRq(const PHttpRq& HttpRq)
 {
     PUrl HttpRqUrl = HttpRq->GetUrl();
     // extract function name
-    TStr FunNm = HttpRqUrl->GetPathSeg(0);
+    const TStr FunNm = HttpRqUrl->GetPathSegs() > 0 ? HttpRqUrl->GetPathSeg(0) : "";
     // extract parameters
     TStrKdV FldNmValPrV;
     PUrlEnv HttpRqUrlEnv = HttpRq->GetUrlEnv();
