@@ -7337,7 +7337,7 @@ PRecSet TBase::Search(const PQuery& Query) {
     if (Query->IsSort()) { Query->Sort(this, RecSet); }
     // trim if necessary
     if (Query->IsLimit()) { RecSet = Query->GetLimit(RecSet); }
-    // return what we have, trimed if necessary
+    // return what we have, trimmed if necessary
     return RecSet;
 }
 
