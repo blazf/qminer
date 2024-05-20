@@ -159,3 +159,5 @@ test*.txt
 .vscode/
 test/cache/data/
 test/cache/test_base/
+test/cache/test_base.zip
+test/cache/test_cache

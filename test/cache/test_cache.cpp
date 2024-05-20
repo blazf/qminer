@@ -2,6 +2,30 @@
 #include <qminer.h>
 #include <qminer_storage.h>
 
+#if defined(GLib_MACOSX)
+
+#include <mach/mach.h>
+
+void ReportMemory(TStr Msg = "") {
+    mach_task_basic_info info;
+    mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
+
+    if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&info, &infoCount) != KERN_SUCCESS) {
+        printf("Error getting task info\n");
+    } else {
+		printf("Memory[%s]:  size=%10.2fMB\n", Msg.CStr(), (double)info.resident_size / (double)TInt::Mega);
+	}
+}
+
+#elif defined(GLib_GLIBC)
+
+void ReportMemory(TStr Msg = "") {
+	TSysMemStat MemStat;
+	printf("Memory[%s]:  size=%10.2fMB\n", Msg.CStr(), (double)MemStat.Resident.Val / (double)TInt::Mega);
+}
+
+#endif
+
 void CreateTestStore() {
 	printf("------ Creating test store ------\n");
 	TQm::TEnv::InitLogger(1, "std", true);
@@ -57,6 +81,41 @@ void CreateTestStore() {
 	TQm::TStorage::SaveBase(Base);
 }
 
+void TestStoreCache() {
+	printf("------ Testing store cache ------\n");
+	TQm::TEnv::InitLogger(1, "std", true);
+
+	const uint64 StoreCacheSize = 10 * TInt::Mega;
+	const uint64 IndexCacheSize = 10 * TInt::Mega;
+	TQm::PBase Base = TQm::TStorage::LoadBase("./test_base/", faRdOnly, IndexCacheSize, StoreCacheSize);
+	ReportMemory("on_load");
+
+	TQm::PStore ArticleStore = Base->GetStoreByStoreNm("Article");
+	TRnd Rnd(1); uint64 Recs = 0, DataSize = 0;
+	while (Recs < 100*(uint64)TInt::Mega) {
+		const uint64 RecId = Rnd.GetUniDevInt64(ArticleStore->GetRecs());
+		// load cache fields
+		const TStr Url = ArticleStore->GetFieldNmStr(RecId, "URI");
+		const TStr Title = ArticleStore->GetFieldNmStr(RecId, "Title");
+		const TStr Body = ArticleStore->GetFieldNmStr(RecId, "Body");
+		const TStr Image = ArticleStore->GetFieldNmStr(RecId, "Image");
+		const TStr Details = ArticleStore->GetFieldNmStr(RecId, "Details");
+		const TStr ExtractedDates = ArticleStore->GetFieldNmStr(RecId, "ExtractedDates");
+		const TStr Date = ArticleStore->GetFieldNmStr(RecId, "Date");
+		const uchar Flags = ArticleStore->GetFieldNmByte(RecId, "Flags");
+		Recs++;
+		DataSize += Url.Len() + Title.Len() + Body.Len() + Image.Len() + Details.Len() + ExtractedDates.Len() + Date.Len() + sizeof(Flags);
+		// print status every 1000 records
+		if (Recs % 100000 == 0) {
+			ReportMemory(TStr::Fmt("recs=%llu, data=%.2fMB", Recs, (double)DataSize / (double)TInt::Mega));
+		}
+	}
+}
+
+void TestIndexCache() {
+
+}
+
 int main(int argc, char* argv[]) {
 	TEnv Env(argc, argv, TNotify::StdNotify);
 	TQm::TEnv::Init();
@@ -75,6 +134,12 @@ int main(int argc, char* argv[]) {
 		if (Env.IsArgStr("--create")) {
 			printf("Creating test store ...\n");
 			CreateTestStore();
+		} else if (Env.IsArgStr("--store")) {
+			printf("Testing store cache ...\n");
+			TestStoreCache();
+		} else if (Env.IsArgStr("--index")) {
+			printf("Testing index cache ...\n");
+			TestIndexCache();
 		} else {
 			printf("No arguments provided.\n");
 		}
