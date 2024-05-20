@@ -113,7 +113,49 @@ void TestStoreCache() {
 }
 
 void TestIndexCache() {
+	printf("------ Testing index cache ------\n");
+	TQm::TEnv::InitLogger(1, "std", true);
 
+	const uint64 StoreCacheSize = 100 * TInt::Mega;
+	const uint64 IndexCacheSize = 100 * TInt::Mega;
+	TWPt<TQm::TBase> Base = TQm::TStorage::LoadBase("./test_base/", faRdOnly, IndexCacheSize, StoreCacheSize);
+	ReportMemory("on_load");
+
+	// prepare list of possible words
+	TQm::PStore ArticleStore = Base->GetStoreByStoreNm("Article");
+	TQm::PIndexVoc IndexVoc = Base->GetIndexVoc();
+	const int BodyKeyId = IndexVoc->GetKeyId(ArticleStore->GetStoreId(), "Body");
+	EAssert(IndexVoc->IsWordVoc(BodyKeyId));
+	EAssert(IndexVoc->GetKey(BodyKeyId).IsTextPos());
+	TStrV WordStrV; IndexVoc->GetAllWordStrV(BodyKeyId, WordStrV);
+	printf("Body index has %d words\n", WordStrV.Len());
+	// map words to ids
+	TIntV WordIdV;
+	for (const TStr& WordStr : WordStrV) {
+		const int WordId = IndexVoc->GetWordId(BodyKeyId, WordStr);
+		WordIdV.Add(WordId);
+	}
+
+	printf("Sleeping for 10 seconds to note down memory in task manager ...\n");
+	sleep(10);
+	printf("Waking up ...\n");
+
+	TRnd Rnd(1); uint64 Searches = 0, TotalRecords = 0;
+	while (Searches < 100*(uint64)TInt::Mega) {
+		// prepare single word query
+		// const int RndWordId = WordIdV[123];
+		const int RndWordId = WordIdV[Rnd.GetUniDevInt(WordIdV.Len())];
+		const TStr RndWordStr = IndexVoc->GetWordStr(BodyKeyId, RndWordId);
+		const TQm::TQueryItem Item(Base, "Article", "Body", TUInt64V::GetV(RndWordId), TIntV());
+		// execute query
+		TQm::PRecSet RecSet = Base->Search(Item);
+		TotalRecords += RecSet->GetRecs();
+		// print status every 1000 searches
+		if (Searches % 100000 == 0) {
+			ReportMemory(TStr::Fmt("searches=%llu, records=%llu", Searches, TotalRecords));
+		}
+		Searches++;
+	}
 }
 
 int main(int argc, char* argv[]) {
