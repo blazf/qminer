@@ -6609,7 +6609,8 @@ TBlobBsStats TIndex::GetBlobStats() const {
 }
 
 TGixStats TIndex::GetGixStats(const bool& RefreshP) const {
-    TGixStats Stats = GixFull->GetGixStats(RefreshP);
+    TGixStats Stats = GixPos->GetGixStats(RefreshP);
+    Stats.Add(GixFull->GetGixStats(RefreshP));
     Stats.Add(GixSmall->GetGixStats(RefreshP));
     Stats.Add(GixTiny->GetGixStats(RefreshP));
     return Stats;

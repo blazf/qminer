@@ -135,6 +135,10 @@ void TestIndexCache() {
 		// print status every 1000 searches
 		if (Searches % 100000 == 0) {
 			ReportMemory(TStr::Fmt("searches=%llu, records=%llu", Searches, TotalRecords));
+			const TGixStats GixStats = Base->GetIndex()->GetGixStats(true);
+			printf("Catch hit vs miss: %llu vs %llu  (%.2f hit)\n", GixStats.CacheHits.Val, GixStats.CacheMisses.Val,
+				(double)GixStats.CacheHits.Val / (double)(GixStats.CacheHits.Val + GixStats.CacheMisses.Val));
+			printf("Cache size: %sB, Avg[ItemV.Len()]=%.2f\n", TUInt64::GetMegaStr(GixStats.CacheMemUsed).CStr(), GixStats.AvgLen.Val);
 		}
 		Searches++;
 	}
